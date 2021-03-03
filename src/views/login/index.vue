@@ -2,7 +2,7 @@
 <div class="login-container">
   <!-- 导航栏 -->
   <van-nav-bar class="page-nav-bar" title="登录">
-    <van-icon slot="left" name="cross" @click="$router.back()" />
+    <van-icon v-if="$route.query.redirect" slot="left" name="cross" @click="$router.back()" />
   </van-nav-bar>
   <!-- 导航栏 -->
   <!-- 登陆表单 -->
@@ -33,7 +33,7 @@
       </template>
     </van-field>
     <div class="login-btn-warp">
-      <van-button block type="info" native-type="submit">登录</van-button>
+      <van-button class="login-btn" block type="info" native-type="submit">登录</van-button>
     </div>
   </van-form>
 </div>
@@ -48,15 +48,15 @@ export default {
   data () {
     return {
       user: {
-        mobile: '',
-        code: ''
+        mobile: '13911111111',
+        code: '246810'
       },
       userFormRules: {
         mobile: [{
           required: true,
           message: '手机号不能为空'
         }, {
-          pattern: /^1[3|5|7|8]\d{9}$/
+          pattern: /^1[3578]\d{9}$/
         }],
         code: [{
           required: true,
@@ -86,10 +86,11 @@ export default {
       })
       // 3. 提交表单请求登录
       try {
-        const res = await login(user)
-        this.$store.commit('setUser', res.data.data)
-        console.log('登陆成功', res)
+        const { data } = await login(user)
+        this.$store.commit('setUser', data.data)
         this.$toast.success('登陆成功')
+        // this.$router.back()
+        this.$router.push(this.$route.query.redirect || '/')
       } catch (err) {
         if (err.response.status === 400) {
           this.$toast.fail('手机号或验证码错误')
@@ -115,7 +116,7 @@ export default {
       } catch (err) {
         // 发送失败，关闭倒计时
         this.isCountDownShow = false
-        if (err.response.status === 429) {
+        if (err.response && err.response.status === 429) {
           this.$toast('发送太频繁了，请稍后重试')
         } else {
           this.$toast('发送失败，请稍后重试')

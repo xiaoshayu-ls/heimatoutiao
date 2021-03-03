@@ -14,7 +14,7 @@ export default new Vuex.Store({
   mutations: {
     setUser (state, user) {
       state.user = user
-      // 为了防止刷新丢失 ，我们需要把数据备份到本地存储
+      // 为了防止刷新丢失 ， 我们需要把数据备份到本地存储
       // window.localStorage.setItem(TOKEN_KEY, JSON.stringify(state.user))
       setItem(TOKEN_KEY, state.user)
     }
