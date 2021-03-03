@@ -109,7 +109,7 @@ export default {
   // 定义属性
   props: {
     articleId: {
-      type: [String, Number],
+      type: [String, Number, Object],
       required: true
     }
   },
