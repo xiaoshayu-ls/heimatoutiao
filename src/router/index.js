@@ -43,7 +43,8 @@ const routes = [
   {
     path: '/article/:articleId',
     name: 'article',
-    component: () => import('@/views/article/articleindex.vue')
+    component: () => import('@/views/article/articleindex.vue'),
+    props: true // 开启props传参，实际就是把路由参数映射到组件的props数据中
   }
 ]
 

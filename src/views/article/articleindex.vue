@@ -10,7 +10,12 @@ export default {
   name: 'ArticleIndex',
   components: {},
   // 定义属性
-  props: {},
+  props: {
+    articleId: {
+      type: [String, Number],
+      required: true
+    }
+  },
   data () {
     return {}
   },
