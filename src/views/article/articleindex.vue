@@ -36,18 +36,24 @@
           <div slot="title" class="user-name">{{article.aut_name}}</div>
           <div slot="label" class="publish-date">{{article.pubdate | relativeTime}}</div>
           <van-button
+            v-if="article.is_followed"
+            class="follow-btn"
+            round
+            size="small"
+            :loading="followLoading"
+            @click="onfollow"
+          >已关注</van-button>
+          <van-button
+            v-else
             class="follow-btn"
             type="info"
             color="#3296fa"
             round
             size="small"
             icon="plus"
+            :loading="followLoading"
+            @click="onfollow"
           >关注</van-button>
-          <!-- <van-button
-            class="follow-btn"
-            round
-            size="small"
-          >已关注</van-button> -->
         </van-cell>
         <!-- /用户信息 -->
 
@@ -108,6 +114,7 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 import { getArticleById } from '@/api/article'
 import { ImagePreview } from 'vant'
+import { deleteFollow, addFollow } from '@/api/user'
 export default {
   name: 'ArticleIndex',
   components: {},
@@ -122,7 +129,8 @@ export default {
     return {
       article: {}, // 文章详情
       loading: false, // 加载中的状态
-      errStatus: 0 // 失败的状态码
+      errStatus: 0, // 失败的状态码
+      followLoading: false
     }
   },
   // 计算属性，会监听依赖属性值随之变化
@@ -145,7 +153,7 @@ export default {
 
         // 数据驱动视图这件事不是立即的
         this.article = data.data
-
+        // this.$nextTick(this.previewImage)
         // 初始化图片点击预览
         setTimeout(() => {
           this.previewImage()
@@ -172,6 +180,29 @@ export default {
           })
         }
       })
+    },
+    async onfollow() {
+      this.followLoading = true // 展示关注按钮的loading状态
+      try {
+        if (this.article.is_followed) {
+          // 已关注，则取消关注
+          await deleteFollow(this.article.aut_id)
+          // this.article.is_followed = false
+        } else {
+          // 未关注，则添加关注
+          await addFollow(this.article.aut_id)
+          // this.article.is_followed = true
+        }
+        // 更新视图
+        this.article.is_followed = !this.article.is_followed
+      } catch (err) {
+        let message = '加载失败,请稍后重试'
+        if (err.response && err.response.status === 400) {
+          message = '你不能关注你自己'
+        }
+        this.$toast(message)
+      }
+      this.followLoading = false // 展示关注按钮的loading状态
     }
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
